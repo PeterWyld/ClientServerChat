@@ -29,6 +29,7 @@ public class Server {
 			
 			while(true) {
 				String userInput = clientIn.readLine();
+				//send all other clients the message
 				clientOut.println(userInput);
 			}		
 		} catch (IOException e) {
