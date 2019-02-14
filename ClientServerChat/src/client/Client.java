@@ -48,6 +48,15 @@ public class Client {
 	}
 	
 	public static void main(String[] args) {
+		for(int i = 0; i <= args.length -1; i++) {
+			if (args[i].charAt(0) == '-') {
+				switch(args[i]) {
+					case "-csp": 
+						Utilities.parseIntDefault(args[i+1], 14006);
+						i++;
+				}
+			}
+		}
 		new Client("localhost", 14006).go();
 	}
 }
