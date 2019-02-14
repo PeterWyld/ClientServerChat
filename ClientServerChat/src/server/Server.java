@@ -6,9 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Server {
 	private ServerSocket in;
+	private List<ClientOnServer> Clients = new LinkedList<ClientOnServer>();
 	
 	public Server(int port) {
 		try {
@@ -21,14 +24,12 @@ public class Server {
 	public void go() {
 		try {
 			System.out.println("Server listening");
-			Socket s = in.accept();
+			Clients.add(new ClientOnServer(in.accept()));
 			System.out.println("Server accepted connection on " + in.getLocalPort() + " ; " + s.getPort() );
-			InputStreamReader r = new InputStreamReader(s.getInputStream());
-			BufferedReader clientIn = new BufferedReader(r);
-			PrintWriter clientOut = new PrintWriter(s.getOutputStream(), true);
+
 			
 			while(true) {
-				String userInput = clientIn.readLine();
+				
 				//send all other clients the message
 				clientOut.println(userInput);
 			}		
