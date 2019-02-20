@@ -51,22 +51,22 @@ public class Client extends Thread{
 	
 	@Override
 	public void run() {
-		while(true) {
+		boolean uninterrupted = true;
+		while(uninterrupted) {
 			String serverRes = "";
 			try {
 				serverRes = serverIn.readLine();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				uninterrupted = false;
 			}
 			System.out.println(serverRes);
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				uninterrupted = false;
 			}
 		}
+		System.out.println("You have been disconnected from the server");
 	}
 	
 	public static void main(String[] args) {
