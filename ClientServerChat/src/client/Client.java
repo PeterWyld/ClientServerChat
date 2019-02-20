@@ -7,14 +7,19 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class Client {
-	
+public class Client extends Thread{
+	private BufferedReader serverIn;
+	private PrintWriter serverOut;
+	private BufferedReader userIn;
 	private Socket server;
 
 	public Client(String address, int port) {
 		try {
 			server = new Socket(address,port);
 			System.out.println("done");
+			userIn = new BufferedReader(new InputStreamReader(System.in));
+			serverOut = new PrintWriter(server.getOutputStream(), true);
+			serverIn = new BufferedReader(new InputStreamReader(server.getInputStream()));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -23,16 +28,12 @@ public class Client {
 	}
 	
 	public void go() {
+		String userInput = "";
+		this.start();
 		try {
-			BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));
-			PrintWriter serverOut = new PrintWriter(server.getOutputStream(), true);
-			BufferedReader serverIn = new BufferedReader(new InputStreamReader(server.getInputStream()));
-			
-			while(true) {
-				String userInput = userIn.readLine();
+			while((userInput = userIn.readLine()) != null) {
 				serverOut.println(userInput);
-				String serverRes = serverIn.readLine();
-				System.out.println(serverRes);
+				
 			}
 			
 		} catch (IOException e) {
@@ -41,22 +42,43 @@ public class Client {
 		finally {
 			try {
 				server.close();
+				//closing the socket
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	public static void main(String[] args) {
-		for(int i = 0; i <= args.length -1; i++) {
-			if (args[i].charAt(0) == '-') {
-				switch(args[i]) {
-					case "-csp": 
-						Utilities.parseIntDefault(args[i+1], 14006);
-						i++;
-				}
+	@Override
+	public void run() {
+		while(true) {
+			String serverRes = "";
+			try {
+				serverRes = serverIn.readLine();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println(serverRes);
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
-		new Client("localhost", 14006).go();
+	}
+	
+	public static void main(String[] args) {
+//		for(int i = 0; i <= args.length -1; i++) {
+//			if (args[i].charAt(0) == '-') {
+//				switch(args[i]) {
+//					case "-csp": 
+//						Utilities.parseIntDefault(args[i+1], 14006);
+//						i++;
+//				}
+//			}
+//		}
+		new Client("localhost", 14001).go();
 	}
 }
