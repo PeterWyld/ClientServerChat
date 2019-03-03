@@ -6,22 +6,29 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
-public class Server extends Thread{
+import client.Utilities;
+
+/**
+ * The server class holds all the threads and deals with the shutdown of the server
+ */
+public class Server{
 	private ServerSocket in;
 	private ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
 	private SyncedMsgQueue messages = new SyncedMsgQueue();
 	private Thread clientAdder;
 	private Thread messageReader;
-	
+
 	public Server(int port) {
 		try {
 			in = new ServerSocket(port);
-			this.start();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * Sets up the required threads and then takes input from the console
+	 */
 	public void go() {
 		clientAdder = new Thread(new ClientAdder(clients, messages, in));
 		clientAdder.start();
@@ -30,33 +37,63 @@ public class Server extends Thread{
 		
 		InputStreamReader r = new InputStreamReader(System.in);
 		BufferedReader serverIn = new BufferedReader(r);
-		
-		while(true) {
-			try {
-				serverIn.readLine();
-				
+		String userInput;
+		try {
+			while(!(userInput = serverIn.readLine()).equals("EXIT")) {
+			
+				//place to put responses to other inputs (non listed in spec)
+				switch (userInput) {
+				default: 
+					System.out.println("Unrecognised Command");
+				}
+			}
+			
 				
 
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-//				try {
-//					in.close();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+
 		}
 		
-	}
-	
-	@Override
-	public void run() {
+		this.close();
+		System.exit(0);
 		
 	}
 	
+	/**
+	 * Interrupts all Threads and then closes the server
+	 */
+	public void close() {
+		for(int i = 0; i <= clients.size() -1; i++) {
+			clients.get(i).interrupt();
+		}
+
+		clientAdder.interrupt();
+		messageReader.interrupt();
+		try {
+			in.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	public static void main(String[] args) {
-		new Server(14001).go();
+		int port = 14001;
+		for(int i = 0; i <= args.length -1; i++) {
+			if (args[i].charAt(0) == '-') {
+				switch(args[i]) {
+					case "-csp": 
+						port = Utilities.parseIntDefault(args[i+1], 14001);
+						i++;
+						break;
+					default: 
+						System.out.println("Tag not recognised: " + args[i]);
+						break;
+				}
+			}
+		}
+		new Server(port).go();
 	}
 }

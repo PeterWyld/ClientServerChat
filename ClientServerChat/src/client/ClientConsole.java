@@ -7,14 +7,14 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class Client extends Thread {
+public class ClientConsole extends Thread {
 	private BufferedReader serverIn;
 	private PrintWriter serverOut;
 	private BufferedReader userIn;
 	private Socket server;
 	private String username;
 
-	public Client(String address, int port, String username, boolean gui) {
+	public ClientConsole(String address, int port, String username) {
 		this.username = username;
 		try {
 			server = new Socket(address, port);

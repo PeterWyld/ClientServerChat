@@ -8,6 +8,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * Runnable class for a thread to continously check to see if another client is trying to connect and then add them to the list of clients
+ */
 public class ClientAdder implements Runnable {
 	private ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
 	private SyncedMsgQueue messages = new SyncedMsgQueue();
@@ -19,19 +22,24 @@ public class ClientAdder implements Runnable {
 		this.in = in;
 	}
 	
+	/**
+	 * Continuously accepts clients until interrupted.
+	 * When a client is accepted the program creates a new clientThread with the relevant readers and
+	 * writers and adds it to the list of clients (which is the same as in the server class
+	 */
 	public void run() {
 		boolean uninterrupted = true;
 		while(uninterrupted) {
 			try {
 				System.out.println("Server listening");
 				
-//				clients.add(new ClientThread(in.accept()));
-
+				//the readers and writers are all created here because otherwise it causes an error for reasons I don't know
 				Socket s = in.accept();
 				InputStreamReader r = new InputStreamReader(s.getInputStream());
 				BufferedReader clientIn = new BufferedReader(r);
 				PrintWriter clientOut = new PrintWriter(s.getOutputStream(), true);
-				clients.add(new ClientThread(clientOut, clientIn, messages));
+				String username = clientIn.readLine();
+				clients.add(new ClientThread(clientOut, clientIn, messages, username));
 				
 				System.out.println("Server accepted connection on " + 
 						in.getLocalPort() + " ; " + s.getPort());
@@ -43,13 +51,7 @@ public class ClientAdder implements Runnable {
 				}
 
 			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-//				try {
-//					in.close();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
+				uninterrupted = false;
 			}
 		}
 	}

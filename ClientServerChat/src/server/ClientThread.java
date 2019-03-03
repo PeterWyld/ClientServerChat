@@ -4,37 +4,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * A Class that represents a client on the server
+ * <br> It has a thread for dealing with getting client input
+ * <br> As well as methods for sending messages to the client
+ */
 public class ClientThread extends Thread{
 	private BufferedReader clientIn;
 	private PrintWriter clientOut;
 	private String clientName = "ANONYMOUS";
-	private static String EXIT_STRING = "cmd:Exit";
+	private static String EXIT_STRING = "EXIT";
 	private SyncedMsgQueue msgQueue;
-	
-//	public ClientThread(Socket socket) {
-//		this.socket = socket;
-//		try {
-//			this.clientIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//			this.clientOut = new PrintWriter(socket.getOutputStream(), true);
-//		} catch (IOException e) {
-//			msgQueue.add(EXIT_STRING);
-//		} finally {
-//			this.close();
-//		}
-//	}
-//	
-//	public ClientThread(Socket socket, String clientName) {
-//		this.socket = socket;
-//		this.clientName = clientName;
-//		try {
-//			this.clientIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//			this.clientOut = new PrintWriter(socket.getOutputStream(), true);
-//		} catch (IOException e) {
-//			msgQueue.add(EXIT_STRING);
-//		} finally {
-//			this.close();
-//		}
-//	}
 	
 	public ClientThread(PrintWriter clientOut, BufferedReader clientIn, SyncedMsgQueue msgQueue) {
 		this.clientIn = clientIn;
@@ -42,8 +22,19 @@ public class ClientThread extends Thread{
 		this.msgQueue = msgQueue;
 	}
 	
+	public ClientThread(PrintWriter clientOut, BufferedReader clientIn, SyncedMsgQueue msgQueue, String clientName) {
+		this.clientIn = clientIn;
+		this.clientOut = clientOut;
+		this.msgQueue = msgQueue;
+		this.clientName = clientName;
+	}
+	
+	/**
+	 * This method attempts to read messages in from the client and put them into the msgQueue <br>
+	 * until either it is interrupted or the client disconnects (and causes an IOException). <br>
+	 */
 	@Override
-	public void run() {
+	public synchronized void run() {
 		String userInput = "";
 		boolean interrupted = false;
 		while(userInput != EXIT_STRING && !interrupted) {
@@ -51,51 +42,40 @@ public class ClientThread extends Thread{
 				userInput = clientIn.readLine();
 				try {
 					Thread.sleep(10);
-					msgQueue.addMessage(clientName + ": " + userInput, Integer.toString(this.hashCode()));
+					msgQueue.addMessage(clientName, userInput, Integer.toString(this.hashCode()));
 					//NOTE: be careful about adding strings into array as it will be putting in their references
 				} catch (InterruptedException e) {
-					try {
-						msgQueue.addMessage(EXIT_STRING, Integer.toString(this.hashCode()));
-					} catch (InterruptedException e1) {
-					}
+					msgQueue.addMessage(clientName, EXIT_STRING, Integer.toString(this.hashCode()));
 					interrupted = true;
 				}
 			} catch (IOException e) {
 				//likely unexpected client exit
-				try {
-					msgQueue.addMessage(EXIT_STRING, Integer.toString(this.hashCode()));
-				} catch (InterruptedException e1) {
-				}
-				sendErrorMessages("Error in reading message");
+				msgQueue.addMessage(clientName, EXIT_STRING, Integer.toString(this.hashCode()));
+				sendServerMessage("Error in reading message");
 				interrupted = true;
 			}
 			
 		}
-			
+		sendServerMessage("You have been disconnected from the server");
 
 		
 	}
 	
-	public void sendMessage(String[] message) {
-		if(!message[1].equals(Integer.toString(this.hashCode()))) {
-			clientOut.println(message[0]);
+	/**
+	 * Sends a message to the client
+	 * @param message An array of Strings (length of array should be either 1 or 3)
+	 */
+	public void sendMessage(Message message) {
+		if(!message.getID().equals(Integer.toString(this.hashCode()))) {
+			clientOut.println(message.getUsername() + ": " + message.getMessage());
 		}
-		
 	}
 	
-	public void sendErrorMessages(String str) {
-		clientOut.println("ERROR: " + str);
+	/**
+	 * A method to be used to send the user messages directly from the server (errors, disconnection message, info requests
+	 */
+	public void sendServerMessage(String message) {
+		clientOut.println(message);
 	}
 	
-//	public void close() {
-//		try {
-//			socket.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//	public Socket getSocket() {
-//		return socket;
-//	}
 }
