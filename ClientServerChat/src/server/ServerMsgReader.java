@@ -12,7 +12,7 @@ public class ServerMsgReader implements Runnable {
 	
 	public ServerMsgReader(ArrayList<ClientThread> clients, SyncedMsgQueue messages) {
 		this.messages = messages;
-		this.clients =clients;
+		this.clients = clients;
 	}
 
 	/**

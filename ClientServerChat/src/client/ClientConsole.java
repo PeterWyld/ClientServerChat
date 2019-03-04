@@ -54,10 +54,14 @@ public class ClientConsole extends Thread {
 	@Override
 	public void run() {
 		boolean uninterrupted = true;
+		String serverRes = "";
 		while (uninterrupted) {
-			String serverRes = "";
+			
 			try {
 				serverRes = serverIn.readLine();
+				if (serverRes == null) {
+					uninterrupted = false;
+				}
 
 			} catch (IOException e) {
 				uninterrupted = false;

@@ -40,6 +40,9 @@ public class ClientThread extends Thread{
 		while(userInput != EXIT_STRING && !interrupted) {
 			try {
 				userInput = clientIn.readLine();
+				if (userInput == null) {
+					interrupted = true;
+				}
 				try {
 					Thread.sleep(10);
 					msgQueue.addMessage(clientName, userInput, Integer.toString(this.hashCode()));
