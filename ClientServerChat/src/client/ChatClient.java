@@ -54,7 +54,7 @@ public class ChatClient {
 		if(gui) {
 			new ClientGUI(host, port, user);
 		} else {
-			new ClientConsole(host, port, user).go();
+			new ClientConsole(host, port).go();
 		}
 	}
 }

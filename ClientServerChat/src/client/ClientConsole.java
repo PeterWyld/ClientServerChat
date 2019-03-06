@@ -7,15 +7,14 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class ClientConsole extends Thread {
+public class ClientConsole {
 	private BufferedReader serverIn;
 	private PrintWriter serverOut;
 	private BufferedReader userIn;
 	private Socket server;
-	private String username;
+	private Thread msgReaderThrd;
 
-	public ClientConsole(String address, int port, String username) {
-		this.username = username;
+	public ClientConsole(String address, int port) {
 		try {
 			server = new Socket(address, port);
 			userIn = new BufferedReader(new InputStreamReader(System.in));
@@ -31,9 +30,9 @@ public class ClientConsole extends Thread {
 
 	public void go() {
 		String userInput = "";
-		this.start();
+		msgReaderThrd = new Thread(new ClientMsgReceiver(serverIn, serverOut));
+		msgReaderThrd.start();
 		try {
-			serverOut.println(username);
 			while ((userInput = userIn.readLine()) != null) {
 				serverOut.println(userInput);
 
@@ -51,31 +50,31 @@ public class ClientConsole extends Thread {
 		}
 	}
 
-	@Override
-	public void run() {
-		boolean uninterrupted = true;
-		String serverRes = "";
-		while (uninterrupted) {
-			
-			try {
-				serverRes = serverIn.readLine();
-				if (serverRes == null) {
-					uninterrupted = false;
-				}
-
-			} catch (IOException e) {
-				uninterrupted = false;
-				serverOut.println("EXIT");
-				System.out.println("You have been disconnected from the server");
-				System.exit(0);
-			}
-			System.out.println(serverRes);
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				uninterrupted = false;
-			}
-		}
-
-	}
+//	@Override
+//	public void run() {
+//		boolean uninterrupted = true;
+//		String serverRes = "";
+//		while (uninterrupted) {
+//			
+//			try {
+//				serverRes = serverIn.readLine();
+//				if (serverRes == null) {
+//					uninterrupted = false;
+//				}
+//
+//			} catch (IOException e) {
+//				uninterrupted = false;
+//				serverOut.println("EXIT");
+//				System.out.println("You have been disconnected from the server");
+//				System.exit(0);
+//			}
+//			System.out.println(serverRes);
+//			try {
+//				Thread.sleep(10);
+//			} catch (InterruptedException e) {
+//				uninterrupted = false;
+//			}
+//		}
+//
+//	}
 }

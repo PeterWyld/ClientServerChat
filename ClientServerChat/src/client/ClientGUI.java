@@ -1,5 +1,7 @@
 package client;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -11,13 +13,16 @@ import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
-public class ClientGUI implements ClientUI, ActionListener{
+public class ClientGUI implements ClientUI{
 	private PrintWriter output;
 	private JFrame frame = new JFrame("ClientServerChat");
-	private JButton sendBtn;
+	private JPanel panel = new JPanel(new FlowLayout());
+	private JButton sendBtn, exitBtn;
 	private JTextArea messageBox, msgHistory, groupHistory;
 	private JScrollPane msgBox, msgHist, grpMsgHist;
 	
@@ -39,57 +44,68 @@ public class ClientGUI implements ClientUI, ActionListener{
 			e.printStackTrace();
 		}
 		
+		SwingUtilities.invokeLater(() -> drawGUI());
 		serverOut.println(username);
 		
 	}
 	
 	public void drawGUI() {
 		sendBtn = new JButton("Send");
-		sendBtn.setBounds(10,375,460,80);
-		frame.add(sendBtn);
+		sendBtn.setPreferredSize(new Dimension(230,80));
 		
+		exitBtn = new JButton("Exit");
+		exitBtn.setPreferredSize(new Dimension(230,80));
+			
 		messageBox = new JTextArea();
 		messageBox.setText("");
 		messageBox.setAlignmentX(messageBox.RIGHT_ALIGNMENT);
 		messageBox.setAlignmentY(messageBox.TOP_ALIGNMENT);
 		messageBox.setBounds(10,300,460,75);
 		msgBox = new JScrollPane(messageBox);
-		msgBox.setBounds(10,300,460,75);
+		msgBox.setPreferredSize(new Dimension(460,75));
 		msgBox.setVisible(true);
-		frame.add(msgBox);
-		
+				
 		msgHistory = new JTextArea();
 		msgHistory.setText("");
 		msgHistory.setAlignmentX(messageBox.RIGHT_ALIGNMENT);
 		msgHistory.setAlignmentY(messageBox.TOP_ALIGNMENT);
-		msgHistory.setBounds(250,0,220,270);
+		msgHistory.setSize(220,270);
 		msgHistory.setEnabled(false);
 		msgHist = new JScrollPane(msgHistory);
-		msgHist.setBounds(250,0,220,270);
+		msgHist.setPreferredSize(new Dimension(220,270));
 		msgHist.setVisible(true);
-		frame.add(msgHist);
-		
+	
 		groupHistory = new JTextArea();
 		groupHistory.setText("");
 		groupHistory.setAlignmentX(messageBox.LEFT_ALIGNMENT);
 		groupHistory.setAlignmentY(messageBox.TOP_ALIGNMENT);
-		groupHistory.setBounds(10,0,230,270);
+//		groupHistory.setBounds(10,0,230,270);
+		groupHistory.setSize(220,270);
 		groupHistory.setEnabled(false);
 		grpMsgHist = new JScrollPane(groupHistory);
-		grpMsgHist.setBounds(10,0,230,270);
+//		grpMsgHist.setBounds(10,0,230,270);
+		grpMsgHist.setPreferredSize(new Dimension(220,270));
 		grpMsgHist.setVisible(true);
-		frame.add(grpMsgHist);
 		
-		sendBtn.addActionListener(this);
-
-		frame.setSize(500,500);
+		panel.add(grpMsgHist);
+		panel.add(msgHist);
+		panel.add(msgBox);
+		panel.add(sendBtn);
+		
+		sendBtn.addActionListener(e -> sendMessage());
+		
+		panel.setSize(513,500);
+		panel.setVisible(true);
+		frame.add(panel);
+		
+		frame.setSize(525,500);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(null);
 		frame.setVisible(true);
 	}
 	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		messageBox.getText();
+	
+	public void sendMessage(ActionEvent e) {
 		sendMessage(messageBox.getText());
 		msgHistory.setText(msgHistory.getText() + "\n" + messageBox.getText());
 		messageBox.setText("");
@@ -97,10 +113,6 @@ public class ClientGUI implements ClientUI, ActionListener{
 	
 	public void recieveMessage(String msg) {
 		groupHistory.setText(groupHistory.getText() + "\n" + msg);
-	}
-	
-	public void sendMessage(String msg) {
-		output.println(msg);
 	}
 	
 	public static void main(String[] args) {

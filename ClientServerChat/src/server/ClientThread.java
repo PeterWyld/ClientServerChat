@@ -37,8 +37,10 @@ public class ClientThread extends Thread{
 	public synchronized void run() {
 		String userInput = "";
 		boolean interrupted = false;
-		while(userInput != EXIT_STRING && !interrupted) {
-			try {
+		
+		try {
+			while(userInput != EXIT_STRING && !interrupted) {
+				clientName = getInfo("What is your username?");
 				userInput = clientIn.readLine();
 				if (userInput == null) {
 					interrupted = true;
@@ -51,17 +53,23 @@ public class ClientThread extends Thread{
 					msgQueue.addMessage(clientName, EXIT_STRING, Integer.toString(this.hashCode()));
 					interrupted = true;
 				}
-			} catch (IOException e) {
-				//likely unexpected client exit
-				msgQueue.addMessage(clientName, EXIT_STRING, Integer.toString(this.hashCode()));
-				sendServerMessage("Error in reading message");
-				interrupted = true;
 			}
-			
+		} catch (IOException e) {
+			//likely unexpected client exit
+			msgQueue.addMessage(clientName, EXIT_STRING, Integer.toString(this.hashCode()));
+			sendServerMessage("Error in reading message");
 		}
 		sendServerMessage("You have been disconnected from the server");
-
-		
+	}
+	
+	/**
+	 * Sends a message to the user and returns the response
+	 * @param msg The message to be sent
+	 * @return Their response
+	 */
+	private String getInfo(String msg) throws IOException{
+		clientOut.println(msg);
+		return clientIn.readLine();
 	}
 	
 	/**
