@@ -1,4 +1,4 @@
-package client;
+
 
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
