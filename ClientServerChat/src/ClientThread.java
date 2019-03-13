@@ -16,12 +16,13 @@ public class ClientThread extends Thread{
 	private String clientName = "ANONYMOUS";
 	private static String EXIT_STRING = "EXIT";
 	private SyncedMsgQueue msgQueue;
+	private Socket socket;
 	
-	public ClientThread(PrintWriter clientOut, BufferedReader clientIn, SyncedMsgQueue msgQueue, Socket s) {
+	public ClientThread(PrintWriter clientOut, BufferedReader clientIn, SyncedMsgQueue msgQueue, Socket socket) {
 		this.clientIn = clientIn;
 		this.clientOut = clientOut;
 		this.msgQueue = msgQueue;
-		System.out.println(s);
+		this.socket = socket;
 	}
 	
 	/**
@@ -34,25 +35,32 @@ public class ClientThread extends Thread{
 		boolean interrupted = false;
 		
 		try {
+			//getting the clients username
 			clientName = getInfo("What is your username?");
 			clientOut.println("Hi! " + clientName);
+			
+			//continuously reading their messages
 			while((userInput = clientIn.readLine()) != EXIT_STRING && !interrupted && userInput != null) {
 				try {
 					Thread.sleep(10);
-					msgQueue.addMessage(clientName, userInput, Integer.toString(this.hashCode()));
-					//NOTE: be careful about adding strings into array as it will be putting in their references
+					msgQueue.addMessage(clientName, userInput, this.hashCode());
 				} catch (InterruptedException e) {
-					msgQueue.addMessage(clientName, EXIT_STRING, Integer.toString(this.hashCode()));
 					interrupted = true;
 				}
 			}
+			
+			//adds a message to let other users know that this user has disconnected
+			msgQueue.addMessage(clientName, EXIT_STRING, this.hashCode());
+			
 		} catch (IOException e) {
 			//likely unexpected client exit
-			msgQueue.addMessage(clientName, EXIT_STRING, Integer.toString(this.hashCode()));
+			msgQueue.addMessage(clientName, EXIT_STRING, this.hashCode());
 			sendServerMessage("Error in reading message");
 		}
 		
 		sendServerMessage("You have been disconnected from the server");
+		close();
+		
 	}
 	
 	/**
@@ -70,7 +78,7 @@ public class ClientThread extends Thread{
 	 * @param message An array of Strings (length of array should be either 1 or 3)
 	 */
 	public void sendMessage(Message message) {
-		if(!message.getID().equals(Integer.toString(this.hashCode()))) {
+		if(!(message.getID() == this.hashCode())) {
 			clientOut.println(message.getUsername() + ": " + message.getMessage());
 		}
 	}
@@ -83,6 +91,11 @@ public class ClientThread extends Thread{
 	}
 	
 	public void close() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			System.out.println("Exception when closing client socket");
+		}
 		
 	}
 	

@@ -23,7 +23,7 @@ public class SyncedMsgQueue {
 	 * @param message
 	 * @param ID
 	 */
-	public synchronized void addMessage(String username, String message, String ID) {
+	public synchronized void addMessage(String username, String message, int ID) {
 		messages.add(new Message(username, message, ID));
 		notifyAll();
 	}

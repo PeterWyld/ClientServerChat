@@ -28,8 +28,18 @@ public class ServerMsgReader implements Runnable {
 				closing = true;
 			}
 			while((currentMessage = messages.nextMessage()) != null) {
-				for (int i = 0; i <= clients.size()-1; i++) {
-					clients.get(i).sendMessage(currentMessage);
+				if(currentMessage.getMessage().equals("EXIT")) {
+					for (int i = 0; i <= clients.size()-1; i++) {
+						if(clients.get(i).hashCode() == currentMessage.getID()) {
+							clients.remove(i);
+						} else {
+							clients.get(i).sendServerMessage(currentMessage.getUsername() + " has left the server.");
+						}
+					}
+				} else {
+					for (int i = 0; i <= clients.size()-1; i++) {
+						clients.get(i).sendMessage(currentMessage);
+					}
 				}
 			}
 		}

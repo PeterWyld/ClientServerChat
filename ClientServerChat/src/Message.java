@@ -6,9 +6,9 @@
 public class Message {
 	private String username;
 	private String message;
-	private String ID;
+	private int ID;
 	
-	public Message(String username, String message, String ID) {
+	public Message(String username, String message, int ID) {
 		this.username = username;
 		this.message = message;
 		this.ID = ID;
@@ -22,7 +22,7 @@ public class Message {
 		return message;
 	}
 	
-	public String getID() {
+	public int getID() {
 		return ID;
 	}
 }
