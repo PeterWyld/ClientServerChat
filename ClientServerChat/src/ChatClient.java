@@ -17,24 +17,31 @@ public class ChatClient {
 				
 				switch (args[i]) {
 					case "-ccp":
-						if (args.length > i) {
+						if (args.length-1 > i) {
 							try {
 								port = Integer.parseInt(args[i + 1]);
 								i++;
+								if (port < 1024 || port > 65535) {
+									System.out.println("Invalid port.");
+									System.exit(0);
+								}
 							} catch (NumberFormatException e) {
 								System.out.println("Port requires an integer arguement");
+								System.exit(0);
 							}
 						} else {
 							System.out.println("The tag '-ccp' requires an arguement");
+							System.exit(0);
 						}
 						break;
 					
 					case "-cca":
-						if (args.length > i) {
+						if (args.length-1 > i) {
 							host = args[i + 1];
 							i++;
 						} else {
 							System.out.println("The tag '-cca' requires an arguement");
+							System.exit(0);
 						}
 						break;
 					

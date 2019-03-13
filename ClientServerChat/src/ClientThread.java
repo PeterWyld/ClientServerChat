@@ -3,6 +3,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.Socket;
 
 /**
  * A Class that represents a client on the server
@@ -16,10 +17,11 @@ public class ClientThread extends Thread{
 	private static String EXIT_STRING = "EXIT";
 	private SyncedMsgQueue msgQueue;
 	
-	public ClientThread(PrintWriter clientOut, BufferedReader clientIn, SyncedMsgQueue msgQueue) {
+	public ClientThread(PrintWriter clientOut, BufferedReader clientIn, SyncedMsgQueue msgQueue, Socket s) {
 		this.clientIn = clientIn;
 		this.clientOut = clientOut;
 		this.msgQueue = msgQueue;
+		System.out.println(s);
 	}
 	
 	/**
@@ -34,11 +36,7 @@ public class ClientThread extends Thread{
 		try {
 			clientName = getInfo("What is your username?");
 			clientOut.println("Hi! " + clientName);
-			while(userInput != EXIT_STRING && !interrupted) {
-				userInput = clientIn.readLine();
-				if (userInput == null) {
-					interrupted = true;
-				}
+			while((userInput = clientIn.readLine()) != EXIT_STRING && !interrupted && userInput != null) {
 				try {
 					Thread.sleep(10);
 					msgQueue.addMessage(clientName, userInput, Integer.toString(this.hashCode()));
@@ -82,6 +80,10 @@ public class ClientThread extends Thread{
 	 */
 	public void sendServerMessage(String message) {
 		clientOut.println(message);
+	}
+	
+	public void close() {
+		
 	}
 	
 }

@@ -39,7 +39,7 @@ public class ClientAdder implements Runnable {
 				InputStreamReader r = new InputStreamReader(s.getInputStream());
 				BufferedReader clientIn = new BufferedReader(r);
 				PrintWriter clientOut = new PrintWriter(s.getOutputStream(), true);
-				clients.add(new ClientThread(clientOut, clientIn, messages));
+				clients.add(new ClientThread(clientOut, clientIn, messages, s));
 				
 				System.out.println("Server accepted connection on " + 
 						in.getLocalPort() + " ; " + s.getPort());
