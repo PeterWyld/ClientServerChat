@@ -40,7 +40,7 @@ public class ClientThread extends Thread{
 			clientOut.println("Hi! " + clientName);
 			
 			//continuously reading their messages
-			while((userInput = clientIn.readLine())!= null && !interrupted && !userInput.equals(EXIT_STRING)) { 
+			while((userInput = clientIn.readLine()) != null && !interrupted && !userInput.equals(EXIT_STRING)) { 
 				//null check has to be before equals check as otherwise it causes a NullPointerException
 				
 				try {
