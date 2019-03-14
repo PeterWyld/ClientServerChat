@@ -161,6 +161,8 @@ public class ClientGUI{
 		
 		try {
 			server.close();
+			serverIn.close();
+			serverOut.close();
 		} catch (IOException e) {
 		}
 		

@@ -25,32 +25,34 @@ public class ClientMsgReceiver implements Runnable {
 	 */
 	public void run() {
 		boolean uninterrupted = true;
-		String serverRes = "";
+		String serverMsg = "";
 		
-		while (uninterrupted) {
-			try {
-				serverRes = serverIn.readLine();
-				if (serverRes == null) {
+		try {
+			while (uninterrupted && (serverMsg = serverIn.readLine()) != null) {
+
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
 					uninterrupted = false;
 				}
-
-			} catch (IOException e) {
-				uninterrupted = false;
-				serverOut.println("EXIT");
-				System.out.println("You have been disconnected from the server");
-				System.exit(0);
+				
+				clientOutput.println(serverMsg);
+				
 			}
-		
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				uninterrupted = false;
-			}
-			
-			clientOutput.println(serverRes);
-			
+		} catch (IOException e) {
 		}
-
+		
+		//Closing connections and ending program.		
+		serverOut.println("EXIT");
+		System.out.println("You have been disconnected from the server");
+		
+		try {
+			serverIn.close();
+			serverOut.close();
+			clientOutput.close();
+		} catch (IOException e) {
+		}
+		
+		System.exit(0);
 	}
-
 }

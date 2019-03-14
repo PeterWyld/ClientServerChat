@@ -64,8 +64,10 @@ public class ClientConsole {
 			msgReaderThrd.interrupt();
 			try {
 				server.close();
+				serverIn.close();
+				serverOut.close();
+				userIn.close();
 			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 	}

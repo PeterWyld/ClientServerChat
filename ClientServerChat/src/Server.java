@@ -54,17 +54,24 @@ public class Server{
 
 		}
 		
+		try {
+			r.close();
+			serverIn.close();
+		} catch (IOException e) {
+		}
+		
 		this.close();
 		System.exit(0);
 		
 	}
 	
 	/**
-	 * Interrupts all Threads and then closes the server
+	 * Interrupts all Threads, closes IO and then closes the server
 	 */
 	private void close() {
 		for(int i = 0; i <= clients.size() -1; i++) {
 			clients.get(i).interrupt();
+			clients.get(i).close();
 		}
 
 		clientAdder.interrupt();
@@ -72,8 +79,6 @@ public class Server{
 		try {
 			in.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	
