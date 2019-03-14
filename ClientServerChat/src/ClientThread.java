@@ -40,7 +40,7 @@ public class ClientThread extends Thread{
 			clientOut.println("Hi! " + clientName);
 			
 			//continuously reading their messages
-			while((userInput = clientIn.readLine()) != EXIT_STRING && !interrupted && userInput != null) {
+			while(!(userInput = clientIn.readLine()).equals(EXIT_STRING) && !interrupted && userInput != null) {
 				try {
 					Thread.sleep(10);
 					msgQueue.addMessage(clientName, userInput, this.hashCode());
@@ -93,11 +93,13 @@ public class ClientThread extends Thread{
 	public void close() {
 		try {
 			socket.close();
-			clientIn.close();
-			clientOut.close();
 		} catch (IOException e) {
 		}
-		
+		clientOut.close();
+		try {
+			clientIn.close();
+		} catch (IOException e) {
+		}
 	}
 	
 }

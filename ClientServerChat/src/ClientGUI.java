@@ -161,10 +161,13 @@ public class ClientGUI{
 		
 		try {
 			server.close();
-			serverIn.close();
-			serverOut.close();
 		} catch (IOException e) {
 		}
+		try {
+			serverIn.close();
+		} catch (IOException e) {
+		}
+		serverOut.close();
 		
 		System.exit(0);
 	}

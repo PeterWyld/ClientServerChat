@@ -55,7 +55,7 @@ public class ClientConsole {
 		msgReaderThrd.start();
 		
 		try {
-			while ((userInput = userIn.readLine()) != null && !userInput.equals("EXIT")) {
+			while ((userInput = userIn.readLine()) != null) {
 				serverOut.println(userInput);
 			}
 		} catch (IOException e) {

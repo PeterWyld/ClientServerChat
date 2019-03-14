@@ -31,6 +31,8 @@ public class ServerMsgReader implements Runnable {
 				if(currentMessage.getMessage().equals("EXIT")) {
 					for (int i = 0; i <= clients.size()-1; i++) {
 						if(clients.get(i).hashCode() == currentMessage.getID()) {
+							clients.get(i).interrupt();
+							clients.get(i).close();
 							clients.remove(i);
 						} else {
 							clients.get(i).sendServerMessage(currentMessage.getUsername() + " has left the server.");
