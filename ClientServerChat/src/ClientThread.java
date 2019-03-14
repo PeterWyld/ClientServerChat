@@ -40,7 +40,9 @@ public class ClientThread extends Thread{
 			clientOut.println("Hi! " + clientName);
 			
 			//continuously reading their messages
-			while(!(userInput = clientIn.readLine()).equals(EXIT_STRING) && !interrupted && userInput != null) {
+			while((userInput = clientIn.readLine())!= null && !interrupted && !userInput.equals(EXIT_STRING)) { 
+				//null check has to be before equals check as otherwise it causes a NullPointerException
+				
 				try {
 					Thread.sleep(10);
 					msgQueue.addMessage(clientName, userInput, this.hashCode());
